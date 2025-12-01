@@ -5,144 +5,183 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>For You</title>
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
     body {
       margin: 0;
       padding: 0;
-      background: #f7f3ff;
-      font-family: "Poppins", sans-serif;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      overflow: hidden;
+      background: linear-gradient(140deg, #f3e9ff, #ffe4ef, #f7e8ff);
+      font-family: 'Poppins', sans-serif;
+      overflow-x: hidden;
     }
 
-    .card {
-      background: white;
-      padding: 40px;
-      width: 85%;
-      max-width: 450px;
-      border-radius: 20px;
-      box-shadow: 0 15px 40px rgba(0,0,0,0.1);
+    /* Floating elements */
+    .float-heart, .float-star {
+      position: fixed;
+      font-size: 22px;
+      opacity: 0.75;
+      animation: floatUp 9s infinite linear;
+    }
+
+    @keyframes floatUp {
+      0% { transform: translateY(100vh) scale(0.8); opacity: 0; }
+      40% { opacity: 1; }
+      100% { transform: translateY(-20vh) scale(1.2); opacity: 0; }
+    }
+
+    /* Main container */
+    .container {
+      padding: 40px 20px;
+      max-width: 600px;
+      margin: auto;
       text-align: center;
-      opacity: 0;
-      transform: translateY(30px);
-      animation: fadeIn 1.3s forwards;
+      animation: fadePage 1.3s ease;
     }
 
+    @keyframes fadePage { from { opacity: 0; } to { opacity: 1; } }
+
+    /* Title */
     h1 {
-      font-size: 2rem;
-      margin-bottom: 10px;
-      color: #7a4bff;
+      font-size: 2.4rem;
+      font-weight: 600;
+      color: #7537ff;
+      margin-top: 40px;
     }
 
-    p {
-      font-size: 1.1rem;
-      color: #444;
-      line-height: 1.6;
+    p.desc {
+      font-size: 1.25rem;
+      margin-top: 15px;
+      color: #333;
+      line-height: 1.8;
     }
 
-    .btn {
-      margin-top: 25px;
-      padding: 12px 25px;
-      background: #7a4bff;
+    /* Interactive Buttons */
+    .choice-btn {
+      display: block;
+      width: 100%;
+      background: white;
+      padding: 16px;
+      margin: 20px auto;
+      border-radius: 18px;
+      font-size: 1.2rem;
+      border: 2px solid #c7a6ff;
+      color: #5a2bd8;
+      font-weight: 600;
+      transition: 0.35s;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    }
+
+    .choice-btn:hover {
+      background: #7d4dff;
       color: white;
-      border: none;
-      border-radius: 10px;
-      font-size: 1rem;
-      cursor: pointer;
-      transition: 0.3s;
+      transform: translateY(-4px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.15);
     }
 
-    .btn:hover {
-      background: #5f3cd1;
-    }
-
-    /* REVEAL HEART */
-    .heart-reveal {
+    /* Reveal Screen */
+    .reveal {
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(0,0,0,0.85);
+      background: rgba(0,0,0,0.93);
       display: flex;
+      flex-direction: column;
       justify-content: center;
       align-items: center;
-      flex-direction: column;
       opacity: 0;
       pointer-events: none;
-      transition: 0.8s;
+      transition: 1s ease;
+      padding: 20px;
+      text-align: center;
     }
 
-    .heart-reveal.active {
+    .reveal.active {
       opacity: 1;
       pointer-events: auto;
     }
 
+    /* Glowing heart */
     .heart {
-      width: 180px;
-      height: 180px;
-      background: red;
+      width: 200px;
+      height: 200px;
+      background: #ff1e4d;
       transform: rotate(45deg);
-      animation: beat 1.2s infinite;
-      box-shadow: 0 0 25px red;
+      position: relative;
+      animation: heartbeat 1.2s infinite ease-in-out;
+      box-shadow: 0 0 50px #ff1e4d;
     }
 
-    .heart:before,
-    .heart:after {
-      content: "";
+    .heart:before, .heart:after {
+      content: '';
       position: absolute;
-      width: 180px;
-      height: 180px;
-      background: red;
+      width: 200px;
+      height: 200px;
       border-radius: 50%;
+      background: #ff1e4d;
     }
+    .heart:before { top: -100px; left: 0; }
+    .heart:after { left: -100px; top: 0; }
 
-    .heart:before { top: -90px; left: 0; }
-    .heart:after { left: -90px; top: 0; }
-
-    .final-text {
-      color: white;
-      margin-top: 25px;
-      font-size: 1.7rem;
-      text-align: center;
-      padding: 0 20px;
-      opacity: 0;
-      animation: fadeIn 2s forwards 1.5s;
-    }
-
-    @keyframes fadeIn {
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    @keyframes beat {
+    @keyframes heartbeat {
       0%, 100% { transform: rotate(45deg) scale(1); }
-      50% { transform: rotate(45deg) scale(1.15); }
+      50% { transform: rotate(45deg) scale(1.3); }
     }
+
+    /* Final Text */
+    .final-text {
+      margin-top: 40px;
+      color: white;
+      font-size: 2.1rem;
+      font-weight: 500;
+      line-height: 1.5;
+      opacity: 0;
+      animation: fadeInWords 2s ease forwards 1.3s;
+    }
+
+    @keyframes fadeInWords { to { opacity: 1; } }
+
   </style>
 </head>
 <body>
-  <div class="card" id="card">
-    <h1>Hey... you ❤️</h1>
-    <p>
-      I don't know how else to say this,<br>
-      so I made this just for you.<br><br>
-      You're cute… you're bold… and honestly,<br>
-      you make everything feel different.
-    </p>
-    <button class="btn" onclick="reveal()">Tap here</button>
-  </div>
 
-  <div class="heart-reveal" id="revealBox">
-    <div class="heart"></div>
-    <div class="final-text">I like you.<br>More than I ever planned to. ❤️</div>
-  </div>
+<script>
+  const icons = ['❤','✨','💖','💫','🌸'];
+  for (let i = 0; i < 22; i++) {
+    const el = document.createElement('div');
+    el.className = Math.random() > 0.5 ? 'float-heart' : 'float-star';
+    el.textContent = icons[Math.floor(Math.random() * icons.length)];
+    el.style.left = Math.random() * 100 + 'vw';
+    el.style.animationDelay = Math.random() * 6 + 's';
+    document.body.appendChild(el);
+  }
+</script>
 
-  <script>
-    function reveal() {
-      document.getElementById('revealBox').classList.add('active');
-    }
-  </script>
+<div class="container">
+  <h1>Hey… you ❤️</h1>
+  <p class="desc">
+    Before anything else, I want you to know this:<br>
+    I actually put effort into this. Because you're worth it.
+  </p>
+
+  <p class="desc">Choose one… be honest 😉</p>
+
+  <button class="choice-btn" onclick="reveal()">Do you want to know what I truly feel?</button>
+  <button class="choice-btn" onclick="reveal()">Are you sure you're ready?</button>
+  <button class="choice-btn" onclick="reveal()">Tap this only if you're brave.</button>
+</div>
+
+<div class="reveal" id="revealBox">
+  <div class="heart"></div>
+  <div class="final-text">I like you.<br>More than I expected. More than I say.<br>And definitely more than you think. ❤️</div>
+</div>
+
+<script>
+  function reveal() {
+    document.getElementById('revealBox').classList.add('active');
+  }
+</script>
+
 </body>
 </html>
