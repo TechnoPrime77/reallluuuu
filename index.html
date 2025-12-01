@@ -1,187 +1,286 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>For You</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>For You — a story</title>
+  <meta name="description" content="A short, cinematic confession." />
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Poppins:wght@300;400;600&display=swap');
+    :root{
+      --accent1:#ff6fa3;
+      --accent2:#8e5bff;
+      --bg1:#1b0b1f; /* deep romantic */
+      --bg2:#2b0f2f;
+      --glass: rgba(255,255,255,0.06);
+      --text-soft: #f6eef8;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;font-family:Poppins,system-ui,Arial;background:linear-gradient(180deg,var(--bg1),var(--bg2));color:var(--text-soft);-webkit-font-smoothing:antialiased}
 
-    body {
-      margin: 0;
-      padding: 0;
-      background: linear-gradient(140deg, #f3e9ff, #ffe4ef, #f7e8ff);
-      font-family: 'Poppins', sans-serif;
-      overflow-x: hidden;
+    /* --- Page layout --- */
+    .page{width:100%;overflow-x:hidden}
+    .section{position:relative;width:100%;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:6vh 5vw}
+
+    /* Background layers for parallax */
+    .bg-layer{position:absolute;inset:0;background-size:cover;background-position:center;will-change:transform;transform:translateZ(0);}
+    .bg-overlay{position:absolute;inset:0;background:linear-gradient(180deg,rgba(10,6,18,0.25),rgba(15,8,30,0.55));mix-blend-mode:multiply}
+
+    /* Soft shapes */
+    .shape{position:absolute;border-radius:50%;filter:blur(42px);opacity:0.28;mix-blend-mode:screen}
+    .shape.a{width:420px;height:420px;right:-120px;top:10%;background:linear-gradient(135deg,var(--accent2),#ff8fb8)}
+    .shape.b{width:320px;height:320px;left:-80px;bottom:-60px;background:linear-gradient(135deg,#ff9fbf,#b08bff)}
+
+    /* Headline */
+    .hero-inner{max-width:920px;text-align:center;padding:2rem}
+    h1{font-family:'Playfair Display',serif;font-size:clamp(28px,5.5vw,56px);line-height:1.02;margin:0 0 14px;color:var(--text-soft);font-weight:700;letter-spacing:0.2px;text-shadow:0 8px 30px rgba(0,0,0,0.5)}
+    p.lead{font-size:clamp(14px,2.1vw,20px);opacity:0.92;margin:0 auto;max-width:680px;color:rgba(246,238,248,0.95)}
+
+    /* story panels */
+    .panel{backdrop-filter:blur(6px);padding:24px;border-radius:14px;background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));box-shadow:0 12px 40px rgba(8,6,12,0.6);max-width:720px}
+
+    /* interactive button (hold-to-reveal) */
+    .cta-wrap{margin-top:28px;display:flex;gap:12px;align-items:center;justify-content:center}
+    .cta{position:relative;display:inline-flex;align-items:center;justify-content:center;padding:14px 26px;border-radius:999px;font-weight:600;font-size:16px;border:none;background:linear-gradient(90deg,var(--accent2),var(--accent1));color:white;cursor:pointer;box-shadow:0 10px 30px rgba(142,91,255,0.18);touch-action:manipulation}
+    .cta:active{transform:scale(.98)}
+
+    /* radial progress ring around button */
+    .progress-ring{position:absolute;inset:-8px;border-radius:999px;padding:6px;pointer-events:none}
+    .progress-ring svg{display:block;width:72px;height:72px}
+
+    /* final reveal section */
+    #final-text{font-family:'Playfair Display',serif;font-size:clamp(22px,4vw,34px);opacity:0;transform:translateY(18px);transition:all .9s cubic-bezier(.2,.9,.2,1);}
+    .revealed #final-text{opacity:1;transform:translateY(0)}
+
+    /* hearts (appealing) */
+    .particle{position:fixed;pointer-events:none;z-index:60}
+    .particle svg{filter:drop-shadow(0 10px 28px rgba(255,120,160,0.18))}
+
+    /* mobile tweaks */
+    @media (max-width:600px){
+      .shape.a{display:none}
+      .shape.b{display:none}
+      .panel{padding:18px}
+      h1{padding:0 4vw}
     }
 
-    /* Floating elements */
-    .float-heart, .float-star {
-      position: fixed;
-      font-size: 22px;
-      opacity: 0.75;
-      animation: floatUp 9s infinite linear;
-    }
+    /* subtle floating for hero text */
+    .float-slow{animation:floatSlow 6s ease-in-out infinite}
+    @keyframes floatSlow{0%{transform:translateY(0)}50%{transform:translateY(-6px)}100%{transform:translateY(0)}}
 
-    @keyframes floatUp {
-      0% { transform: translateY(100vh) scale(0.8); opacity: 0; }
-      40% { opacity: 1; }
-      100% { transform: translateY(-20vh) scale(1.2); opacity: 0; }
-    }
-
-    /* Main container */
-    .container {
-      padding: 40px 20px;
-      max-width: 600px;
-      margin: auto;
-      text-align: center;
-      animation: fadePage 1.3s ease;
-    }
-
-    @keyframes fadePage { from { opacity: 0; } to { opacity: 1; } }
-
-    /* Title */
-    h1 {
-      font-size: 2.4rem;
-      font-weight: 600;
-      color: #7537ff;
-      margin-top: 40px;
-    }
-
-    p.desc {
-      font-size: 1.25rem;
-      margin-top: 15px;
-      color: #333;
-      line-height: 1.8;
-    }
-
-    /* Interactive Buttons */
-    .choice-btn {
-      display: block;
-      width: 100%;
-      background: white;
-      padding: 16px;
-      margin: 20px auto;
-      border-radius: 18px;
-      font-size: 1.2rem;
-      border: 2px solid #c7a6ff;
-      color: #5a2bd8;
-      font-weight: 600;
-      transition: 0.35s;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
-    }
-
-    .choice-btn:hover {
-      background: #7d4dff;
-      color: white;
-      transform: translateY(-4px);
-      box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-    }
-
-    /* Reveal Screen */
-    .reveal {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0,0,0,0.93);
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      opacity: 0;
-      pointer-events: none;
-      transition: 1s ease;
-      padding: 20px;
-      text-align: center;
-    }
-
-    .reveal.active {
-      opacity: 1;
-      pointer-events: auto;
-    }
-
-    /* Glowing heart */
-    .heart {
-      width: 200px;
-      height: 200px;
-      background: #ff1e4d;
-      transform: rotate(45deg);
-      position: relative;
-      animation: heartbeat 1.2s infinite ease-in-out;
-      box-shadow: 0 0 50px #ff1e4d;
-    }
-
-    .heart:before, .heart:after {
-      content: '';
-      position: absolute;
-      width: 200px;
-      height: 200px;
-      border-radius: 50%;
-      background: #ff1e4d;
-    }
-    .heart:before { top: -100px; left: 0; }
-    .heart:after { left: -100px; top: 0; }
-
-    @keyframes heartbeat {
-      0%, 100% { transform: rotate(45deg) scale(1); }
-      50% { transform: rotate(45deg) scale(1.3); }
-    }
-
-    /* Final Text */
-    .final-text {
-      margin-top: 40px;
-      color: white;
-      font-size: 2.1rem;
-      font-weight: 500;
-      line-height: 1.5;
-      opacity: 0;
-      animation: fadeInWords 2s ease forwards 1.3s;
-    }
-
-    @keyframes fadeInWords { to { opacity: 1; } }
+    /* small instructions overlay for audio start */
+    .start-overlay{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:80;background:linear-gradient(180deg,rgba(0,0,0,0.55),rgba(0,0,0,0.55));backdrop-filter:blur(4px)}
+    .start-box{background:var(--glass);padding:18px 22px;border-radius:12px;text-align:center}
+    .start-box p{margin:0 0 8px;color:var(--text-soft)}
+    .start-btn{background:linear-gradient(90deg,var(--accent1),var(--accent2));border:none;padding:10px 18px;border-radius:999px;color:white;font-weight:600}
 
   </style>
 </head>
 <body>
+  <div class="page" id="page">
 
-<script>
-  const icons = ['❤','✨','💖','💫','🌸'];
-  for (let i = 0; i < 22; i++) {
-    const el = document.createElement('div');
-    el.className = Math.random() > 0.5 ? 'float-heart' : 'float-star';
-    el.textContent = icons[Math.floor(Math.random() * icons.length)];
-    el.style.left = Math.random() * 100 + 'vw';
-    el.style.animationDelay = Math.random() * 6 + 's';
-    document.body.appendChild(el);
-  }
-</script>
+    <!-- HERO / Section 1 -->
+    <section class="section" data-speed="0.12">
+      <div class="bg-layer" style="background-image:url('https://images.unsplash.com/photo-1506784983877-45594efa4cbe?auto=format&fit=crop&w=1400&q=80')"></div>
+      <div class="bg-overlay"></div>
+      <div class="shape a" aria-hidden></div>
+      <div class="shape b" aria-hidden></div>
 
-<div class="container">
-  <h1>Hey… you ❤️</h1>
-  <p class="desc">
-    Before anything else, I want you to know this:<br>
-    I actually put effort into this. Because you're worth it.
-  </p>
+      <div class="hero-inner panel float-slow">
+        <h1>For you — the quiet one who became my whole</h1>
+        <p class="lead">I practiced how to say this. Then I realized practice made it truer. This is the short version — scroll with me.</p>
+        <div class="cta-wrap">
+          <button class="cta" id="start-story">Start the story</button>
+        </div>
+      </div>
+    </section>
 
-  <p class="desc">Choose one… be honest 😉</p>
+    <!-- STORY PANEL 1 -->
+    <section class="section" data-speed="0.07">
+      <div class="bg-layer" style="background-image:url('https://images.unsplash.com/photo-1496307042754-b4aa456c4a2d?auto=format&fit=crop&w=1400&q=80')"></div>
+      <div class="bg-overlay"></div>
+      <div class="hero-inner panel">
+        <p class="lead">Remember that time you laughed about nothing and I felt like I could live there forever? It was small, but it changed everything.</p>
+      </div>
+    </section>
 
-  <button class="choice-btn" onclick="reveal()">Do you want to know what I truly feel?</button>
-  <button class="choice-btn" onclick="reveal()">Are you sure you're ready?</button>
-  <button class="choice-btn" onclick="reveal()">Tap this only if you're brave.</button>
-</div>
+    <!-- STORY PANEL 2 + interactive reveal button -->
+    <section class="section" data-speed="0.04">
+      <div class="bg-layer" style="background-image:url('https://images.unsplash.com/photo-1503264116251-35a269479413?auto=format&fit=crop&w=1400&q=80')"></div>
+      <div class="bg-overlay"></div>
+      <div class="hero-inner panel">
+        <p class="lead">I kept this quiet because I wanted it to be perfect. But nothing about you needs fixing.</p>
 
-<div class="reveal" id="revealBox">
-  <div class="heart"></div>
-  <div class="final-text">I like you.<br>More than I expected. More than I say.<br>And definitely more than you think. ❤️</div>
-</div>
+        <div style="margin-top:18px" class="cta-wrap">
+          <button class="cta" id="hold-btn" aria-pressed="false">
+            Hold to reveal
+            <span class="progress-ring" id="ringWrap"></span>
+          </button>
+        </div>
+      </div>
+    </section>
 
-<script>
-  function reveal() {
-    document.getElementById('revealBox').classList.add('active');
-  }
-</script>
+    <!-- FINAL REVEAL -->
+    <section class="section" id="final" data-speed="0.02">
+      <div class="bg-layer" style="background-image:url('https://images.unsplash.com/photo-1505483531331-3d5f9c3b3a1c?auto=format&fit=crop&w=1600&q=90')"></div>
+      <div class="bg-overlay"></div>
+      <div class="hero-inner panel" id="final-panel">
+        <div id="final-text">I like you — deeply. Can we see what this could be?</div>
+      </div>
+    </section>
 
+  </div>
+
+  <!-- particles container -->
+  <div id="particles" aria-hidden class="particle"></div>
+
+  <!-- audio (place file in repo root: bg-music.mp3) -->
+  <audio id="bg-music" loop preload="auto">
+    <source src="bg-music.mp3" type="audio/mpeg">
+  </audio>
+
+  <!-- initial overlay to unlock audio and explain controls -->
+  <div id="startOverlay" class="start-overlay">
+    <div class="start-box">
+      <p>Tap to start the story & music</p>
+      <button class="start-btn" id="startAudio">Tap to start</button>
+    </div>
+  </div>
+
+  <script>
+    /* --- Parallax scroll handler --- */
+    const layers = document.querySelectorAll('.section');
+    function onScroll(){
+      const y = window.scrollY;
+      document.querySelectorAll('.bg-layer').forEach((bg, i) => {
+        const speed = parseFloat(bg.parentElement.dataset.speed || 0.05);
+        bg.style.transform = `translateY(${y * speed}px) scale(1.06)`;
+      });
+    }
+    window.addEventListener('scroll', onScroll, {passive:true});
+    onScroll();
+
+    /* --- Start story button: scroll to next section --- */
+    document.getElementById('start-story').addEventListener('click', ()=>{
+      const next = document.querySelectorAll('.section')[1];
+      next.scrollIntoView({behavior:'smooth'});
+    });
+
+    /* --- Hold-to-reveal with circular progress --- */
+    const holdBtn = document.getElementById('hold-btn');
+    const ringWrap = document.getElementById('ringWrap');
+    const final = document.getElementById('final');
+    const finalPanel = document.getElementById('final-panel');
+    let holdTimer, progress=0, progressRAF;
+    const HOLD_DURATION = 1300; // ms
+
+    // create SVG ring
+    const NS = 'http://www.w3.org/2000/svg';
+    const svg = document.createElementNS(NS,'svg'); svg.setAttribute('viewBox','0 0 36 36');
+    const circle = document.createElementNS(NS,'circle');
+    circle.setAttribute('cx',18); circle.setAttribute('cy',18); circle.setAttribute('r',15);
+    circle.setAttribute('fill','none'); circle.setAttribute('stroke','rgba(255,255,255,0.18)'); circle.setAttribute('stroke-width','2');
+    const ring = document.createElementNS(NS,'circle');
+    ring.setAttribute('cx',18); ring.setAttribute('cy',18); ring.setAttribute('r',15);
+    ring.setAttribute('fill','none'); ring.setAttribute('stroke','white'); ring.setAttribute('stroke-width','2'); ring.setAttribute('stroke-linecap','round');
+    ring.setAttribute('stroke-dasharray','0 100');
+    svg.appendChild(circle); svg.appendChild(ring);
+    ringWrap.appendChild(svg);
+
+    function setRing(p){
+      const dash = `${(p/100)*94} 100`;
+      ring.setAttribute('stroke-dasharray', dash);
+    }
+
+    function startHold(e){
+      e.preventDefault();
+      progress = 0; setRing(0);
+      const start = performance.now();
+      function step(now){
+        progress = Math.min(100, (now-start)/HOLD_DURATION*100);
+        setRing(progress);
+        if(progress<100) progressRAF = requestAnimationFrame(step);
+        else triggerReveal();
+      }
+      progressRAF = requestAnimationFrame(step);
+    }
+    function cancelHold(){ cancelAnimationFrame(progressRAF); setRing(0); }
+
+    ['mousedown','touchstart'].forEach(evt=>holdBtn.addEventListener(evt,startHold));
+    ['mouseup','mouseleave','touchend','touchcancel'].forEach(evt=>holdBtn.addEventListener(evt,cancelHold));
+
+    function triggerReveal(){
+      // create elegant heart burst
+      burstHearts(12);
+      // show final text and scroll to it
+      document.getElementById('page').classList.add('revealed');
+      setTimeout(()=> final.scrollIntoView({behavior:'smooth'}), 220);
+      // small confetti-like shimmer
+      shimmer(28);
+    }
+
+    /* --- Particles: prettier hearts that drift and sway --- */
+    const particles = document.getElementById('particles');
+    function burstHearts(n){
+      for(let i=0;i<n;i++){
+        const el = document.createElement('div'); el.className='p'; el.style.position='fixed';
+        const x = window.innerWidth/2 + (Math.random()-0.5)*160; const y = window.innerHeight/2 + (Math.random()-0.5)*60;
+        el.style.left = x+'px'; el.style.top = y+'px'; el.style.pointerEvents='none'; el.style.zIndex=70;
+        el.innerHTML = heartSVG(14+Math.random()*28, Math.random()*0.9);
+        document.body.appendChild(el);
+        animateParticle(el);
+        setTimeout(()=>safeRemove(el), 2800 + Math.random()*1200);
+      }
+    }
+    function heartSVG(size, opacity){
+      return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="opacity:${opacity}">`+
+             `<path d="M12 20s-6.716-4.35-9.028-6.662C-0.34 10.65 3 6 6.5 6c1.74 0 3 1 4 2 1-1 2.26-2 4-2C21 6 24.34 10.65 21.028 13.338 18.716 15.65 12 20 12 20z" fill="url(#g)"/>`+
+             `<defs><linearGradient id="g" x1="0" x2="1"><stop offset="0" stop-color="#ff91b6"/><stop offset="1" stop-color="#9a70ff"/></linearGradient></defs></svg>`;
+    }
+    function animateParticle(el){
+      const dx = (Math.random()-0.5)*160; const dy = - (220 + Math.random()*160);
+      const rot = (Math.random()-0.5)*60;
+      el.animate([
+        {transform:`translate(0,0) rotate(0deg)`,opacity:1},
+        {transform:`translate(${dx}px, ${dy}px) rotate(${rot}deg)`,opacity:0}
+      ],{duration:2400+Math.random()*900,easing:'cubic-bezier(.2,.8,.2,1)',fill:'forwards'})
+    }
+    function safeRemove(el){ try{el.remove()}catch(e){}
+    }
+
+    /* small shimmer bursts (tiny circles) */
+    function shimmer(n){
+      for(let i=0;i<n;i++){
+        const dot = document.createElement('div'); dot.style.position='fixed'; dot.style.width='8px'; dot.style.height='8px'; dot.style.borderRadius='50%'; dot.style.left=(Math.random()*100)+'vw'; dot.style.top=(Math.random()*100)+'vh'; dot.style.background='linear-gradient(90deg,#ffd5ee,#caa8ff)'; dot.style.opacity=0.95; dot.style.zIndex=60; document.body.appendChild(dot);
+        dot.animate([{transform:'scale(0.4)',opacity:1},{transform:'scale(1.6)',opacity:0}],{duration:900+Math.random()*700,fill:'forwards',easing:'ease-out'});
+        setTimeout(()=>safeRemove(dot),1300);
+      }
+    }
+
+    /* --- Start overlay & audio unlocking --- */
+    const startOverlay = document.getElementById('startOverlay');
+    const startAudioBtn = document.getElementById('startAudio');
+    const audio = document.getElementById('bg-music');
+
+    function startAll(){
+      startOverlay.style.display='none';
+      audio.play().catch(()=>{});
+      // gentle initial hearts
+      burstHearts(6);
+    }
+    startAudioBtn.addEventListener('click', startAll);
+    // also allow overlay to be closed by tapping outside
+    startOverlay.addEventListener('click',(e)=>{ if(e.target===startOverlay) startAll(); });
+
+    /* Accessibility: keyboard support for hold (space/enter) */
+    holdBtn.addEventListener('keydown',(e)=>{ if(e.code==='Space' || e.code==='Enter'){ e.preventDefault(); startHold(e); } })
+    holdBtn.addEventListener('keyup',(e)=>{ if(e.code==='Space' || e.code==='Enter'){ cancelHold(); } })
+
+    /* minor: lazy preload image (improve perceived performance) */
+    const imgs = document.querySelectorAll('.bg-layer'); imgs.forEach(i=>{ const src = i.style.backgroundImage.match(/url\("?(.*?)"?\)/); if(src && src[1]){ const im = new Image(); im.src=src[1]; }});
+
+    /* Helpful note for you: ensure bg-music.mp3 is uploaded to repo root. On GitHub Pages, audio will play only after user interaction (the overlay solves that). */
+
+  </script>
 </body>
 </html>
